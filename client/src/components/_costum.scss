@@ -1,0 +1,21 @@
+@import url(https://use.fontawesome.com/releases/v5.0.10/css/all.css);
+@import url(https://fonts.googleapis.com/css?family=Montserrat:200,300,400,700);
+$font-family-base: Montserrat;
+@import url(https://fonts.googleapis.com/css?family=Poppins:200,300,400,700);
+$headings-font-family: Poppins;
+
+$enable-grid-classes: false;
+$primary: #9b59b6;
+$secondary: #8e44ad;
+$success: #2ecc71;
+$danger: #e74c3c;
+$info: #3498db;
+$warning: #f1c40f;
+$light: #ecf0f1;
+$dark: #0d1316;
+$spacer: 1rem;
+$border-width: 1px;
+$btn-border-radius: 0.5rem;
+$headings-font-weight: bold;
+$border-radius: 0.5rem;
+@import '~bootstrap/scss/bootstrap';
