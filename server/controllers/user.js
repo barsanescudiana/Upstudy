@@ -4,13 +4,13 @@ const Word = require('../models/word')
 const controller = {
 
     getKnown: async(req, res) => {
-        User.findOne({email: `${req.body.email}`})
+        User.findOne({token: `${req.body.token}`})
         .then((user) => res.status(200).send(user.knownWords))
         .catch((err) => res.status(404).sent(err))
     },
 
     learnWord: async (req, res) => {
-        const user = await User.findOne({ email: `${req.body.email}` })
+        const user = await User.findOne({ token: `${req.body.token}` })
         const word = await Word.findOne({base: `${req.params.base}`})
 
         if(user) { 
@@ -50,6 +50,12 @@ const controller = {
 
     getByEmail: async (req, res) => {
          User.findOne({email: `${req.body.email}`})
+        .then((user) => res.status(200).send(user))
+        .catch((err) => res.status(404).sent(err))
+    },
+
+    getByToken: async (req, res) => {
+         User.findOne({token: `${req.body.token}`})
         .then((user) => res.status(200).send(user))
         .catch((err) => res.status(404).sent(err))
     },

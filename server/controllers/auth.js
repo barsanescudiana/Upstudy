@@ -46,7 +46,7 @@ const controller = {
         const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET)
         user.token = token
         await user.save()
-
+        
         res.send({user: user, token: token})
     } 
 }

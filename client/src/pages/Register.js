@@ -13,6 +13,23 @@ const Register = () => {
 
     let history = useHistory()
 
+    const handleSubmit = (e) => {
+        axios.post(`${server}/api/auth/register`, {
+            name: name,
+            email: username, 
+            password: password
+        })
+        .then((res) => {
+            console.log(res)
+            if(res.status === 200) {
+                history.push('/login')
+            }
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+    }
+
     return(
         <>
             <div className='form-wrapper position-relative container-sm shadow p-3 mb-5 bg-body 
@@ -41,7 +58,7 @@ const Register = () => {
                             onChange={(e) => {
                                 setUsername(e.target.value)
                             }}/>
-                        <label for="email-input">Email address</label>
+                        <label htmlFor="email-input">Email address</label>
                     </div>
                     <div className='pass-wrapper form-floating mb-3'>
                         <Form.Control 
@@ -53,25 +70,12 @@ const Register = () => {
                             onChange={(e) => {
                                 setPassword(e.target.value)
                             }}/>
-                        <label for="pass-input">Password</label>
+                        <label htmlFor="pass-input">Password</label>
                     </div>
                     <button className='btn btn-primary'
                     type='button'
                     onClick={(e) => {
-                        axios.post(`${server}/api/auth/register`, {
-                                    name: name,
-                                    email: username, 
-                                    password: password
-                                })
-                                .then((res) => {
-                                    console.log(res)
-                                    if(res.status === 200) {
-                                        history.push('/login')
-                                    }
-                                })
-                                .catch((error) => {
-                                    console.log(error)
-                                })
+                        handleSubmit(e)
                     }}> Sign up </button>
                 </Form>
             </div>

@@ -31,7 +31,7 @@ const controller = {
 
     getRandom: async (req, res) => {
 
-        const user = await User.findOne({email: `${req.body.email}`})
+        const user = await User.findOne({email: `${req.params.email}`})
         if(!user) return res.status(404).send(`Email doesn't exist!`)
 
         let known = [];
@@ -48,11 +48,11 @@ const controller = {
             words.push(doc)
         }
         if(words.length !== 0) return res.status(200).send(words)
-        else return res.status(404).send('Not found!')
+        else return res.status(404).send('No words found')
     },
 
     getUnknown: async (req, res) => {
-        const user = await User.findOne({email: `${req.body.email}`})
+        const user = await User.findOne({email: `${req.params.email}`})
         if(!user) return res.status(404).send(`Email doesn't exist!`)
 
         let known = [];
@@ -60,10 +60,10 @@ const controller = {
             known.push(word.base)
         })
 
-        let words = await Word.find({base: {$nin: known}})
+        let words = await Word.find({ base: {$nin: known}})
         if(!words) return res.status(404).send('No words in db')
 
-        res.status(202).send({user: user, known: known, words: words})
+        res.status(202).send(words)
 
     }
 }

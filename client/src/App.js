@@ -1,63 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.scss';
-import Login from './components/Login';
-import Register from './components/Register'
-import Home from './components/Home'
+import Login from './pages/Login';
+import Register from './pages/Register'
+import Home from './pages/Home'
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
 } from "react-router-dom";
-import axios from 'axios';
-import { server } from './components/GlobalVariables'
-
-
-
+import Footer from './components/Footer';
 
 const App = () => {
 
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState()
 
-  const getUser = () => {
-    axios.get(server + '/session', { withCredentials: true })
-      .then((response) => {
-        console.log(response.data.user)
-        setUser(response.data.user)
-        console.log(user)
-      })
-      .catch((e) => {
-        console.log(e)
-      })
-  }
-
-  getUser()
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem("user");
+    if (loggedInUser) {
+      const foundUser = JSON.parse(loggedInUser);
+      setUser(foundUser);
+    }
+  }, []);
 
   return (
     <>
       <Router>
-        <div className="App d-flex flex-column justify-content-center align-items-center">
+        <div className="App container-fluid d-flex orientation-vertical">
         <header>
           <div>
             <Switch>
-              <Route exact path='/home'> 
-                <Home user={user}/>;
-              </Route>
+              <Route exact path='/home' component={Home}></Route>
               <Route exact path='/login' component={Login}></Route>
               <Route exact path='/register' component={Register}></Route>
             </Switch>
           </div>
         </header>
-
-        { console.log(user) }
-
-        <footer className='footer bg-dark d-flex flex-column align-items-center justify-content-center'>
-              <img src={'./assets/logo-black.svg'} alt='Logo' className='logo position-relative align-center'></img> 
-        </footer>
+        <Footer/>
       </div>
       </Router>
-
-      
     </>
   );
 }
