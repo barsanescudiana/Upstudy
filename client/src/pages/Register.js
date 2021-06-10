@@ -81,7 +81,6 @@ const Register = () => {
                             placeholder='Password'
                             onChange={(e) => {
                                 setPassword(e.target.value)
-                                console.log(e.target.value)
                             }}/>
                         <label htmlFor="pass-input">Password</label>
                     </div>

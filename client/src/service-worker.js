@@ -12,6 +12,7 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
+import swURL from 'sw:../service-worker.js';
 
 clientsClaim();
 
@@ -68,5 +69,47 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
+
+// Register the service worker
+// if ('serviceWorker' in navigator) {
+//   // Wait for the 'load' event to not block other work
+//   window.addEventListener('load', async () => {
+//     // Try to register the service worker.
+//     try {
+//       const reg = await navigator.serviceWorker.register(swURL);
+//       console.log('Service worker registered! 😎', reg);
+//     } catch (err) {
+//       console.log('😥 Service worker registration failed: ', err);
+//     }
+//   });
+// }
+
+// // Choose a cache name
+// const cacheName = 'cache-v1';
+// // List the files to precache
+// const precacheResources = ['/', '/profile', '/words', '/login', '/register'];
+
+// // When the service worker is installing, open the cache and add the precache resources to it
+// self.addEventListener('install', (event) => {
+//   console.log('Service worker install event!');
+//   event.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(precacheResources)));
+// });
+
+// self.addEventListener('activate', (event) => {
+//   console.log('Service worker activate event!');
+// });
+
+// // When there's an incoming fetch request, try and respond with a precached resource, otherwise fall back to the network
+// self.addEventListener('fetch', (event) => {
+//   console.log('Fetch intercepted for:', event.request.url);
+//   event.respondWith(
+//     caches.match(event.request).then((cachedResponse) => {
+//       if (cachedResponse) {
+//         return cachedResponse;
+//       }
+//       return fetch(event.request);
+//     }),
+//   );
+// });
 
 // Any other custom service worker logic can go here.

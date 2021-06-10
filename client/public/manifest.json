@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Upstudy",
+  "name": "Upstudy App",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,8 +18,18 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#9b59b6",
+  "background_color": "#fff",
+  "orientation": "any",
+  "lang": "en-US",
+  "categories": ["education"],
+  "shortcuts": [
+    {
+      "name": "Words learned",
+      "url": "/words",
+      "description": "List of known words"
+    }
+  ]
 }

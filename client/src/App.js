@@ -15,7 +15,7 @@ import AllWords from './pages/AllWords';
 
 const App = () => {
 
-  const [user, setUser] = useState()
+  const [, setUser] = useState()
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem("user");

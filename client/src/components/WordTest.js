@@ -4,10 +4,10 @@ import {server} from '../pages/GlobalVariables'
 import '../App.scss'
 
 const WordTest = (props) => {
-    const [words, setWords] = useState(props.words)
+    const [words, ] = useState(props.words)
     const [flag, setFlag] = useState(props.flag)
     const [word, setWord] = useState(words[flag])
-    const [learning, setLearning] = useState([])
+    const [learning, ] = useState([])
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
 
     const updateUser = () => {
@@ -75,10 +75,10 @@ const WordTest = (props) => {
         
     }
 
-    const handleCharacter = (e, character) => {
-        e.preventDefault()
-        document.getElementById('test-input').value += character
-    }
+    // const handleCharacter = (e, character) => {
+    //     e.preventDefault()
+    //     document.getElementById('test-input').value += character
+    // }
 
     const handleListen = (e) => {
         e.preventDefault()
@@ -92,7 +92,7 @@ const WordTest = (props) => {
     const handleLearn = () => {
         learning.forEach(element => {
             if(element.count === 3) {
-            
+                console.log(learning, words)
                 axios.post(`${server}/api/user/learn/${element.word}`, {
                     token: user.token,
                     notes: element.notes
@@ -111,6 +111,9 @@ const WordTest = (props) => {
 
             words.pop(words.find(found => found.base === element.word))
             learning.pop(element)
+            
+            setFlag(Math.floor(Math.random() * words.length) !== flag ? Math.floor(Math.random() * words.length) : 0)
+            setWord(words[flag])
         });
         
     }
@@ -118,7 +121,7 @@ const WordTest = (props) => {
     const handleAddNote = (e) => {
         e.preventDefault()
         if(learning.length === 0) {
-            words.map((element) => {
+            words.map(element => {
                 learning.push({word: element.base, count: 0, notes: ''})
             })
         }
@@ -140,7 +143,7 @@ const WordTest = (props) => {
                 console.log('new word learned')
             }
         })
-    }, [])
+    }, [handleLearn(), learning, updateUser()])
 
     
 

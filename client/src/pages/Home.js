@@ -4,7 +4,6 @@ import { server } from './GlobalVariables'
 import Login from "./Login"
 import Card from '../components/Card'
 import uuid from "react-uuid";
-import User from "../components/User"
 import { useHistory } from "react-router"
 import Form from 'react-bootstrap/Form'
 
@@ -108,7 +107,6 @@ const Home = () => {
         axios.post(`${server}/api/user/delete`, {
             email: user.email
         }).then((res) => {
-            console.log(res)
             setUsers(res.data)
         }).catch((err) => {
             console.error(err)
@@ -123,8 +121,44 @@ const Home = () => {
         })
     }
 
+    const handleDeleteCurrent = (e, user) => {
+        e.preventDefault()
+        axios.post(`${server}/api/user/delete`, {
+            email: user.email
+        }).then((res) => {
+            setUsers(res.data)
+        }).catch((err) => {
+            console.error(err)
+        })
+
+        localStorage.removeItem('user')
+        history.push('/login')
+    }
+
     const handleAdmin = (e, user) => {
         e.preventDefault()
+        axios.post(`${server}/api/user/admin`, {
+            email: user.email
+        })
+        .then((res) => {
+            setUsers(res.data)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+    }
+
+    const handleMakeUser = (e, user) => {
+        e.preventDefault()
+        axios.post(`${server}/api/user/user`, {
+            email: user.email
+        })
+        .then((res) => {
+            setUsers(res.data)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
     }
 
     useEffect( () => {
@@ -153,7 +187,9 @@ const Home = () => {
                 <>
                     <div className='row position-relative p-3'>
                         <div className='row'> Welcome,
-                            <User user={user}/>
+                            <h3> {user.name} <span> </span>
+                                <span className="badge rounded-pill bg-light text-primary"> 🥇 {user.score} points </span>
+                            </h3>
                         </div>
                         <div className='row-ml'>
                             <button 
@@ -199,7 +235,9 @@ const Home = () => {
                     <div className='d-grid position-relative p-3'>
                         <div className='row'>
                             <div className='col'> Welcome,
-                                <User user={user}/>
+                                <h3> {user.name} <span> </span>
+                                    <span className="badge rounded-pill bg-light text-primary"> 📚 {allWords.length} words stored </span>
+                                </h3>
                             </div>
                             <div className='col-ml'>
                                 <button 
@@ -230,69 +268,78 @@ const Home = () => {
                                     type='button'
                                     className='col btn btn-danger btn-sm text-light rounded m-1'
                                     onClick={(e) => {
-                                        handleDelete(e)
+                                        handleDeleteCurrent(e, user)
                                     }}>
                                     ⚙️ Delete account
                                 </button>
                             </div>
                         </div>
                         
-                    
                     <div className='row d-flex flex-row justify-content-evenly flex-wrap mt-4'> 
                         <div className='col m-2'> 
                             { users.map((user) => (
                                 <div id={uuid()} className='row'>
-                                    { user.role === 'admin' ? (
-                                        <div className='container-fluid bg-light text-dark rounded p-4 m-2'>
-                                            <h4 className='col'> ⚙️ {user.name} <span> </span>
-                                                    <span className="badge rounded-pill bg-warning text-dark"> 🕵️ {user.role} </span>
-                                            </h4>
-                                            <div className='row'> 
-                                                <span className='col'> 📮 {user.email} </span>
-                                            </div>
-                                            <div className='row'> 
-                                                <span className='col text-dark'> 📅 <span> </span>
-                                                    <span className='text-primary font-weight-large'>
-                                                        {new Date(user.date).toDateString()} 
-                                                    </span> 
-                                                </span>
-                                            </div>
-                                            
-                                        </div>
+                                    { user.email ===JSON.parse(localStorage.getItem('user')).email ? (
+                                        users.pop(user)
                                     ) : (
-                                        <div className='container-fluid d-grid bg-light text-dark rounded p-4 m-2'>
-                                            <h4 className='col'> 🧠 {user.name} <span> </span>
-                                                    <span className="badge rounded-pill bg-primary text-light"> 🥇 {user.score} points </span>
-                                            </h4>
-                                            <div className='row'> 
-                                                <span className='col'> 📮 {user.email} <br/> 📚 {user.knownWords.length} words learned<br/>
+                                    <> 
+                                        { user.role === 'admin' ? (
+                                            <div id={uuid()} className='container-fluid bg-light text-dark rounded p-4 m-2'>
+                                                <h4 className='col'> ⚙️ {user.name} <span> </span>
+                                                        <span className="badge rounded-pill bg-warning text-dark"> 🕵️ {user.role} </span>
+                                                </h4>
+                                                <div className='row'> 
+                                                    <span className='col'> 📮 {user.email} </span>
+                                                </div>
+                                                <div className='row'> 
                                                     <span className='col text-dark'> 📅 <span> </span>
-                                                        <span className='text-primary'> 
+                                                        <span className='text-primary font-weight-large'>
                                                             {new Date(user.date).toDateString()} 
                                                         </span> 
                                                     </span>
-                                                </span>
-                                                <div className='row mt-2'>
+                                                </div>
+                                                <div className='row'>
                                                     <button 
-                                                        className='btn btn-sm btn-outline-danger col ms-4 m-2 me-1'
-                                                        onClick={(e) => {handleDelete(e, user)}}> 
-                                                        Remove user
+                                                        className='btn btn-sm btn-outline-info col m-2 me-1'
+                                                        onClick={(e) => {handleMakeUser(e, user)}}> 
+                                                        Make user
                                                     </button>
-                                                    <button 
-                                                        className='btn btn-sm btn-outline-warning col m-2 me-1'
-                                                        onClick={(e) => {handleAdmin(e, user)}}> 
-                                                        Make admin
-                                                    </button>
+                                                </div> 
+                                            </div>  
+                                        ) : (
+                                            <div id={uuid()} className='container-fluid d-grid bg-light text-dark rounded p-4 m-2'>
+                                                <h4 className='col'> 🧠 {user.name} <span> </span>
+                                                        <span className="badge rounded-pill bg-primary text-light"> 🥇 {user.score} points </span>
+                                                </h4>
+                                                <div className='row'> 
+                                                    <span className='col'> 📮 {user.email} <br/> 📚 {user.knownWords.length} words learned<br/>
+                                                        <span className='col text-dark'> 📅 <span> </span>
+                                                            <span className='text-primary'> 
+                                                                {new Date(user.date).toDateString()} 
+                                                            </span> 
+                                                        </span>
+                                                    </span>
+                                                    <div className='row mt-2'>
+                                                        <button 
+                                                            className='btn btn-sm btn-outline-danger col ms-4 m-2 me-1'
+                                                            onClick={(e) => {handleDelete(e, user)}}> 
+                                                            Remove user
+                                                        </button>
+                                                        <button 
+                                                            className='btn btn-sm btn-outline-warning col m-2 me-1'
+                                                            onClick={(e) => {handleAdmin(e, user)}}> 
+                                                            Make admin
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        )}       
+                                    </> 
                                     )}
-
-
                                 </div>
-                            ))}
+                                )
+                            )}      
                         </div>
-
                         <Form 
                             id='add-form'
                             style={{visibility: 'hidden'}}
@@ -345,7 +392,6 @@ const Home = () => {
                                 handleSubmit(e)
                             }}> Insert </button>
                         </Form>
-                    
                     </div>
                 </div>
                 </>

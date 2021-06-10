@@ -20,17 +20,17 @@ const User = (props) => {
     
     useEffect(() => {
         updateUser()
-        axios.get(`${server}/api/words/`)
+
+        props.words && props.words.length !== 0
+            ? setWords(props.words) 
+            : axios.get(`${server}/api/words/`)
         .then((res) => {
             setWords(res.data)
         })
         .catch((err) => {
             console.error(err)
         })
-        return () => {
-            
-        }
-    }, [])
+    }, [words, props.words])
 
     return (
         user.role === 'user' ? (

@@ -1,18 +1,15 @@
 import {useState} from 'react'
-import {generatePath, useHistory} from 'react-router'
+import { useHistory} from 'react-router'
 import axios from 'axios'
 import {server} from '../pages/GlobalVariables'
 import uuid from 'react-uuid'
-import CreateNote from './CreateNote'
 
 const Known = (props) => {
 
     const [user, setUser] = useState(props.user)
     const [words, setWords] = useState(props.user.knownWords)
-    const [clicked, setClicked] = useState('')
+    const [, setClicked] = useState('')
     const history = useHistory()
-    const width = `${user.knownWords.length * 10} + %`
-    const [note, setNote] = useState('default')
 
     const updateUser = () => {
         axios.get(`${server}/api/user/${user.email}`)
@@ -41,11 +38,6 @@ const Known = (props) => {
         })    
         
         updateUser()
-    }
-
-    const handleNote = (e) => {
-        setNote(e.target.value)
-        console.log(e.target.value)
     }
 
     const handleEditNote = (e, word) => {

@@ -6,7 +6,7 @@ import Edit from "../components/Edit"
  
 const Profile = () => {
 
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
+    const [user, ] = useState(JSON.parse(localStorage.getItem('user')))
 
     const [clicked, setClicked] = useState('view')
 

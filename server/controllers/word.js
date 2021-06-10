@@ -81,6 +81,17 @@ const controller = {
         } catch(err) {
             res.status(400).send(err)
         }
+    },
+
+    deleteByBase: async(req, res) => {
+        Word.findOneAndDelete({base: req.body.base})
+        .then(async () => {
+            const words = await Word.find()
+            res.status(200).send(words)
+        })
+        .catch((err) => {
+            res.status(404).send(err)
+        })
     }
 }
 

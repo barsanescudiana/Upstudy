@@ -1,6 +1,5 @@
 import Form from 'react-bootstrap/Form'
-import {useState, useCallback} from 'react'
-import {useHistory} from 'react-router'
+import {useState} from 'react'
 import axios from 'axios'
 import {server} from '../pages/GlobalVariables'
 
@@ -10,22 +9,22 @@ const Edit = (props) => {
     const [email, setEmail] = useState(props.user.email)
     const [name, setName] = useState(props.user.name)
     const [password, setPassword] = useState(props.user.email)
-    const [, updateState] = useState();
-    const forceUpdate = useCallback(() => updateState(() => {
-        updateUser()
-    }), []);
-    const history = useHistory()
+    // const [, updateState] = useState();
+    // const forceUpdate = useCallback(() => updateState(() => {
+    //     updateUser()
+    // }), []);
+    // const history = useHistory()
 
-    const updateUser = () => {
-        axios.get(`${server}/api/user/${user.email}`)
-        .then((res) => {
-            setUser(res.data)
-            localStorage.setItem('user', JSON.stringify(res.data))
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-    }
+    // const updateUser = () => {
+    //     axios.get(`${server}/api/user/${user.email}`)
+    //     .then((res) => {
+    //         setUser(res.data)
+    //         localStorage.setItem('user', JSON.stringify(res.data))
+    //     })
+    //     .catch((err) => {
+    //         console.log(err)
+    //     })
+    // }
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -36,15 +35,16 @@ const Edit = (props) => {
             email: email,
             password: password
         }).then((res) => {
-            setUser(localStorage.getItem('user'))
-            history.push('/')
-            history.push({ 
-                pathname: '/profile', 
-                state: {
-                    user: localStorage.getItem('user')
-                }
-            })
-            forceUpdate()
+            setUser(res.data)
+            localStorage.setItem('user', JSON.stringify(res.data[0]))
+            // history.push('/')
+            // history.push({ 
+            //     pathname: '/profile', 
+            //     state: {
+            //         user: localStorage.getItem('user')
+            //     }
+            // })
+            // forceUpdate()
         }).catch((err) => {
             console.error(err)
         })

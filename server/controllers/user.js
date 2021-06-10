@@ -16,6 +16,28 @@ const controller = {
         .catch((err) => res.status(404).sent(err))
     },
 
+    makeAdmin: async(req, res) => {
+        User.findOneAndUpdate({email: req.body.email}, {$set: {
+            role: 'admin'
+        }}).then(async () => {
+            const users = await User.find()
+            res.status(200).send(users)
+        }).catch((err) => {
+            res.statu(404).send("user not found", err)
+        })
+    },
+
+    makeUser: async(req, res) => {
+        User.findOneAndUpdate({email: req.body.email}, {$set: {
+            role: 'user'
+        }}).then(async () => {
+            const users = await User.find()
+            res.status(200).send(users)
+        }).catch((err) => {
+            res.statu(404).send("user not found", err)
+        })
+    },
+
     learnWord: async (req, res) => {
         const user = await User.findOne({token: `${req.body.token}` })
         const word = await Word.findOne({base: `${req.params.base}`})
@@ -113,8 +135,9 @@ const controller = {
             email: req.body.email,
             password: hashPassword
 
-        }}).then((response) => {
-            res.status(201).send('modified')
+        }}).then(async () => {
+            const user = await User.find({email: req.body.email})
+            res.status(201).send(user)
         }).catch((err) => {
             res.status(404).send('user not found', {error: err})
         })

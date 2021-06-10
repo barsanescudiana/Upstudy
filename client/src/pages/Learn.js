@@ -7,7 +7,7 @@ import {server} from '../pages/GlobalVariables'
 
 
 const Learn = (props) => {
-    const [words, setWords] = useState(props.location.state.words)
+    const [words, ] = useState(props.location.state.words)
     const [user, setUser] = useState(props.location.state.user)
     const history = useHistory()
 
@@ -28,7 +28,7 @@ const Learn = (props) => {
         return () => {
             
         }
-    }, [words])
+    }, [words, updateUser()])
 
     return (
         <div className='d-flex flex-column mt-5'>

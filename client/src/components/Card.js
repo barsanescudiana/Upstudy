@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './Card.scss'
 
 const Card = (props) => {
-    const [word, setWord] = useState(props.word)
+    const [word, ] = useState(props.word)
     const [clicked, isClicked] = useState(props.isClicked)
 
     const handleClick = (e) => {
