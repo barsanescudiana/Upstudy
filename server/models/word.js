@@ -11,8 +11,13 @@ const wordSchema = new mongoose.Schema({
     }, 
     points: {
         type: Number, 
-        required: true, 
+        required: true,
+        unique: true, 
     }, 
+    notes: {
+        type: String,
+        default: null
+    }
 })
 
 module.exports = mongoose.model('Word', wordSchema)

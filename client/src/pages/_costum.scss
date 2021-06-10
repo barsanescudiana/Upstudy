@@ -19,3 +19,17 @@ $btn-border-radius: 0.5rem;
 $headings-font-weight: bold;
 $border-radius: 0.5rem;
 @import '~bootstrap/scss/bootstrap';
+
+.correct {
+  box-shadow: 0 0 0 0.25rem rgb(92 206 144 / 25%) !important;
+}
+
+.font-weight-bold {
+  font-weight: 700 !important;
+  font-size: 2rem;
+}
+
+.buttons-container {
+  width: 215px !important;
+}
+

@@ -7,5 +7,6 @@ router.get('/random/:email', wordController.getRandom)
 router.get('/target/:base', verify, wordController.getTargetByBase)
 router.get('/:base', verify, wordController.getByBase)
 router.get('/unknown/:email', wordController.getUnknown)
+router.post('/new', wordController.insertWord)
 
 module.exports = router

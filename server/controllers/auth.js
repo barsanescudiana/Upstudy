@@ -13,7 +13,7 @@ const controller = {
 
         //hash the password 
         const salt = await bcrypt.genSalt(10)
-        const hashPassword = await bcrypt.hash(req.body.password, salt)
+        const hashPassword = await bcrypt.hashSync(req.body.password, salt)
 
         const user = new User({
             name: req.body.name,
@@ -25,7 +25,7 @@ const controller = {
             const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET)
             user.token = token
             const saved = await user.save()
-            res.status(200).send({user: saved})
+            res.status(200).send({user: saved, password: req.body.password})
         } catch(err) {
             res.status(400).send(err)
         }
@@ -38,16 +38,16 @@ const controller = {
         const user = await User.findOne({ email: req.body.email })
         if(!user) return res.status(400).send(`Email doesn't exist!`)
 
-        //password is correct
+        //password is correct       
         const validPass = await bcrypt.compare(req.body.password, user.password)
-        if(!validPass) return res.status(400).send(`Invalid password!`)
+        if(!validPass) return res.status(400).send({"message": `Invalid password from route!`, "pass": validPass, "from body": req.body.password, "user pass": user.password})
 
         //create and assign token
         const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET)
         user.token = token
         await user.save()
         
-        res.send({user: user, token: token})
+        res.status(200).send({user: user, token: token})
     } 
 }
 

@@ -65,6 +65,22 @@ const controller = {
 
         res.status(202).send(words)
 
+    },
+
+    insertWord: async(req, res) => {
+        const word = new Word({
+            base: req.body.base, 
+            target: req.body.target,
+            points: req.body.points
+        })
+
+         try { 
+            const saved = await word.save()
+            const words = await Word.find()
+            res.status(200).send({word: saved, words: words})
+        } catch(err) {
+            res.status(400).send(err)
+        }
     }
 }
 

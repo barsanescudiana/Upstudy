@@ -12,6 +12,14 @@ const Login = () => {
 
     let history = useHistory()
 
+    
+    let axiosConfig = {
+        headers: {
+            'Content-Type': 'application/json',
+            "Access-Control-Allow-Origin": "*",
+        }
+    };
+
     const handleLogin = (data) => {
         setUser(data)
     }
@@ -19,11 +27,23 @@ const Login = () => {
     async function handleSubmit(event) {
         event.preventDefault();
 
-        try {
+        if(document.getElementById('email-input').value === '') {
+            document.getElementById('email-input').classList.add('is-invalid')
+        } else {
+            document.getElementById('email-input').classList.remove('is-invalid')
+            document.getElementById('email-input').classList.add('is-valid')
+            if(document.getElementById('pass-input').value === '') {
+                document.getElementById('pass-input').classList.add('is-invalid')
+            } else {
+                document.getElementById('pass-input').classList.remove('is-invalid')
+                document.getElementById('pass-input').classList.add('is-valid')
+         
+            try {
+            
            axios.post(`${server}/api/auth/login`, {
                 email: username, 
                 password: password
-            })
+            }, axiosConfig)
             .then((res) => {
                 if(res.status === 200) {
                     if(res.data.user) {
@@ -34,7 +54,7 @@ const Login = () => {
                     console.log(res.data.user, user)
 
                     history.push({
-                        pathname: '/home', 
+                        pathname: '/', 
                         state: { token: res.data.user.token}})
                 }
             })
@@ -45,45 +65,65 @@ const Login = () => {
             alert(e.message);
         }
     }
+    }
+}
 
 
 
     return (
-        <div className='d-flex flex-column'>
-            <div className='form-wrapper position-relative ontainer-sm shadow p-3 mb-5 bg-body 
+        <div className='d-flex flex-column justify-content-center align-items-center m-5'>
+            <div className='form-wrapper position-relative shadow p-3 mb-5 bg-body 
             ml-2 mr-2 d-flex flex-column justify-content-center rounded'>
                 <h2 className='h2 mb-3'> Login </h2>
                 <Form>
                     <div className='email-wrapper d-flex flex-column form-floating mb-3'>
                     <Form.Control 
                         as='input'
+                        required
                         type='email' 
                         className='form-control' 
                         id='email-input' 
-                        placeholder='name@example.com'
                         onChange={(e) => {
                             setUsername(e.target.value)
                         }}/>
                     <label htmlFor="email-input">Email address</label>
+                    <div className="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div className="invalid-feedback">
+                        Please enter your email.
+                    </div>
                 </div>
                 <div className='pass-wrapper form-floating mb-3'>
                     <Form.Control 
                         as='input'
+                        required
                         type='password' 
                         className='form-control' 
                         id='pass-input'
-                        placeholder='Password'
                         onChange={(e) => {
                             setPassword(e.target.value)
+                            console.log(e.target.value)
                         }}/>
                     <label htmlFor="pass-input">Password</label>
+                    <div className="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div className="invalid-feedback">
+                        Please enter your password.
+                    </div>
                 </div>
                     <button 
                     className='btn btn-primary m-2'
-                    type='button'
+                    type='submit'
                     onClick={(e) => {
                         handleSubmit(e)
+                        console.log(password)
                     }}> Login </button>
+                    <p>
+                       <small> Do not have an account? <a href='/register' className='text-primary'> 
+                       <br/>Register now</a>! </small> 
+                    </p>
                 </Form>
 
 

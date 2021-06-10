@@ -9,6 +9,9 @@ import {
   Route,
 } from "react-router-dom";
 import Footer from './components/Footer';
+import Profile from './pages/Profile';
+import Learn from './pages/Learn';
+import AllWords from './pages/AllWords';
 
 const App = () => {
 
@@ -25,16 +28,17 @@ const App = () => {
   return (
     <>
       <Router>
-        <div className="App container-fluid d-flex orientation-vertical">
-        <header>
-          <div>
+        <div className="App container-fluid d-block mb-5 p-5">
+          
             <Switch>
-              <Route exact path='/home' component={Home}></Route>
+              <Route exact path='/' component={Home}></Route>
               <Route exact path='/login' component={Login}></Route>
               <Route exact path='/register' component={Register}></Route>
+              <Route exact path='/profile' component={Profile}></Route>
+              <Route exact path='/learn' component={Learn}></Route>
+              <Route exact path='/words' component={AllWords}></Route>
             </Switch>
-          </div>
-        </header>
+
         <Footer/>
       </div>
       </Router>

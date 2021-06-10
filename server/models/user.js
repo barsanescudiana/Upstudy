@@ -16,7 +16,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String, 
         required: true, 
-        min: 8
+        min: 5,
+        max: 255
     }, 
     date: {
         type: Date, 
@@ -32,6 +33,10 @@ const userSchema = new mongoose.Schema({
         points: {
             type: Number, 
         },
+        notes: {
+            type: String, 
+            default: null
+        }
     }], 
     score: {
         type: Number,
@@ -40,15 +45,19 @@ const userSchema = new mongoose.Schema({
     token: {
         type: String, 
         required: true
+    }, 
+    role: {
+        type: String,
+        default: 'user'
     }
     
 })
 
-userSchema.pre('save', async function() {
-    const user = this;
-    if(user.isModified('password')) {
-        user.password = await bcrypt.hash(user.password, 8);
-    }
-})
+// userSchema.pre('save', async function() {
+//     const user = this;
+//     if(user.isModified('password')) {
+//         user.password = await bcrypt.hash(user.password, 8);
+//     }
+// })
 
 module.exports = mongoose.model('User', userSchema)
