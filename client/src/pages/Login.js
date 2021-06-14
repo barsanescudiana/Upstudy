@@ -24,23 +24,19 @@ const Login = () => {
         setUser(data)
     }
 
-    async function handleSubmit(event) {
+    const handleSubmit = async (event)  => {
         event.preventDefault();
 
         if(document.getElementById('email-input').value === '') {
             document.getElementById('email-input').classList.add('is-invalid')
-        } else {
-            document.getElementById('email-input').classList.remove('is-invalid')
-            document.getElementById('email-input').classList.add('is-valid')
-            if(document.getElementById('pass-input').value === '') {
-                document.getElementById('pass-input').classList.add('is-invalid')
-            } else {
-                document.getElementById('pass-input').classList.remove('is-invalid')
-                document.getElementById('pass-input').classList.add('is-valid')
-         
-            try {
+        } 
+        if(document.getElementById('pass-input').value === '') {
+            document.getElementById('pass-input').classList.add('is-invalid')
+        } 
+        
+        try {
             
-           axios.post(`${server}/api/auth/login`, {
+            axios.post(`${server}/api/auth/login`, {
                 email: username, 
                 password: password
             }, axiosConfig)
@@ -48,27 +44,45 @@ const Login = () => {
                 if(res.status === 200) {
                     if(res.data.user) {
                         handleLogin(res.data.user)
+                        if (document.getElementById('email-input').classList.contains('is-invalid')) {
+                            document.getElementById('email-input').classList.remove('is-invalid') 
+                            document.getElementById('email-input').classList.add('is-valid')
+                        } else {
+                            document.getElementById('email-input').classList.add('is-valid')
+                        }
+
+                        if (document.getElementById('pass-input').classList.contains('is-invalid')) { 
+                            document.getElementById('pass-input').classList.remove('is-invalid') 
+                            document.getElementById('pass-input').classList.add('is-valid')
+                        } else {
+                            document.getElementById('pass-input').classList.add('is-valid')
+                        }
                         localStorage.setItem('user', JSON.stringify(res.data.user))
                         setUser(res.data.user)
+                         setTimeout(() => history.push({
+                                            pathname: '/', 
+                                            state: { token: res.data.user.token}}), 1000)
                     }
-                    console.log(res.data.user, user)
-
-                    history.push({
-                        pathname: '/', 
-                        state: { token: res.data.user.token}})
+                } else { 
+                    if(res.status === 401)
+                        document.getElementById('email-input').classList.add('is-invalid')
+                    else if( res.status === 402)  document.getElementById('pass-input').classList.add('is-invalid')
                 }
-            })
+            })        
             .catch((error) => {
                 console.log(error)
+                if (document.getElementById('email-input').classList.contains('is-valid')) 
+                    document.getElementById('email-input').classList.remove('is-valid')  
+                if (document.getElementById('pass-input').classList.contains('is-valid')) 
+                    document.getElementById('pass-input').classList.remove('is-valid') 
+                document.getElementById('email-input').classList.add('is-invalid')  
+                document.getElementById('pass-input').classList.add('is-invalid')
             })
         } catch (e) {
             alert(e.message);
         }
+    
     }
-    }
-}
-
-
 
     return (
         <div className='d-flex flex-column justify-content-center align-items-center m-5'>
@@ -88,10 +102,10 @@ const Login = () => {
                         }}/>
                     <label htmlFor="email-input">Email address</label>
                     <div className="valid-feedback">
-                        Looks good!
+                        Looks good! 👀 
                     </div>
                     <div className="invalid-feedback">
-                        Please enter your email.
+                        Email and password do not match 😔
                     </div>
                 </div>
                 <div className='pass-wrapper form-floating mb-3'>
@@ -103,13 +117,14 @@ const Login = () => {
                         id='pass-input'
                         onChange={(e) => {
                             setPassword(e.target.value)
+                            console.log(e.target.value)
                         }}/>
                     <label htmlFor="pass-input">Password</label>
                     <div className="valid-feedback">
-                        Looks good!
+                        Looks good! 👀 
                     </div>
                     <div className="invalid-feedback">
-                        Please enter your password.
+                        Email and password do not match 😔
                     </div>
                 </div>
                     <button 
@@ -117,7 +132,6 @@ const Login = () => {
                     type='submit'
                     onClick={(e) => {
                         handleSubmit(e)
-                        console.log(password)
                     }}> Login </button>
                     <p>
                        <small> Do not have an account? <a href='/register' className='text-primary'> 

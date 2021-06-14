@@ -9,6 +9,7 @@ import {server} from '../pages/GlobalVariables'
 const Learn = (props) => {
     const [words, ] = useState(props.location.state.words)
     const [user, setUser] = useState(props.location.state.user)
+    let [points, setPoints] = useState(0)
     const history = useHistory()
 
     const updateUser = () => {
@@ -25,17 +26,21 @@ const Learn = (props) => {
     
     useEffect(() => {
         updateUser()
-        return () => {
+        console.log(words)
+        words.map((word) => {
+            console.log(word.points)
+            points += word.points
             
-        }
-    }, [words, updateUser()])
+        })
+        setPoints(points)
+    }, [])
 
     return (
         <div className='d-flex flex-column mt-5'>
             <div className='row'> Welcome,
                 <User user={user}/>
             </div>
-            <WordTest words={words} flag={Math.floor(Math.random() * words.length)}></WordTest>
+            <WordTest words={words} flag={Math.floor(Math.random() * words.length)} points={points}></WordTest>
             <button
                 type='submit'
                 className='btn btn-dark position-absolute m-3 top-0 end-0'

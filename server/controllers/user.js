@@ -23,7 +23,7 @@ const controller = {
             const users = await User.find()
             res.status(200).send(users)
         }).catch((err) => {
-            res.statu(404).send("user not found", err)
+            res.status(404).send("user not found", err)
         })
     },
 
@@ -34,7 +34,7 @@ const controller = {
             const users = await User.find()
             res.status(200).send(users)
         }).catch((err) => {
-            res.statu(404).send("user not found", err)
+            res.status(404).send(err)
         })
     },
 
@@ -128,7 +128,6 @@ const controller = {
 
         const salt = await bcrypt.genSalt(10)
         const hashPassword = await bcrypt.hash(req.body.password, salt)
-        
 
         User.findOneAndUpdate({ token: `${req.body.token}` }, { $set: {
             name: req.body.name,

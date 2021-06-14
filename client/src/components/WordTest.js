@@ -1,14 +1,18 @@
 import {useState, useEffect} from 'react'
+import { useHistory } from 'react-router'
 import axios from 'axios'
 import {server} from '../pages/GlobalVariables'
 import '../App.scss'
 
 const WordTest = (props) => {
-    const [words, ] = useState(props.words)
+    const [words, setWords] = useState(props.words)
     const [flag, setFlag] = useState(props.flag)
     const [word, setWord] = useState(words[flag])
-    const [learning, ] = useState([])
+    const [learning, setLearning] = useState([])
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
+    var [points, setPoints] = useState(0)
+    const [progress, setProgress] = useState(0)
+    const history = useHistory()
 
     const updateUser = () => {
         axios.get(`${server}/api/user/${user.email}`)
@@ -37,41 +41,56 @@ const WordTest = (props) => {
 
     const handleNext = (e) => {
         e.preventDefault()
-        if(document.getElementById('test-input').value.toLowerCase() === word.base.toLowerCase()) {
-            if(learning.find(element => 
-                element.word === word.base
-            )) {
-                learning.forEach(element => {
-                if(element.word === word.base) {
-                    element.count++;
-                    element.notes += document.getElementById('noteTextArea').value 
-                }
-                
-                if(element.count === 3) {
-                    console.log('count === 3')
-                    handleLearn()
-                    setFlag(Math.floor(Math.random() * words.length) !== flag ? Math.floor(Math.random() * words.length) : 0)
-                    setWord(words[flag])
-                }
-                })
+        if(words.length !== 0) {
+            setProgress(0)
+            if(document.getElementById('test-input').value.toLowerCase() === word.base.toLowerCase()) {
+                if(learning.find(element => 
+                    element.word === word.base
+                )) {
+                    learning.forEach(element => {
+                    if(element.word === word.base) {
+                        element.count++;
+                        element.notes += document.getElementById('noteTextArea').value
+                        setProgress(element.count)
+                        console.log(progress) 
+                    }
+                    
+                    if(element.count === 3) {
+                        console.log('count === 3')
+                        handleLearn()
+                        setFlag(Math.floor(Math.random() * words.length) !== flag ? Math.floor(Math.random() * words.length) : 0)
+                        setWord(words[flag])
+                    }
+                    })
 
-            } else {
-                learning.push({
-                    word: word.base,
-                    count: 1,
-                    notes: ''
-                })
+                } else {
+                    learning.push({
+                        word: word.base,
+                        count: 1,
+                        notes: ''
+                    })
+                }
             }
+
+            setFlag(Math.floor(Math.random() * words.length) !== flag ? Math.floor(Math.random() * words.length) : 0)
+            setWord(words[flag])
+            document.getElementById('test-input').value = null
+            document.getElementById('noteTextArea').value = null
+
+            if(e.target.value === null || document.getElementById('test-input').classList.contains('correct')) {
+                document.getElementById('test-input').classList.remove('border-success', 'outline-success', 'correct')
+            
+            }
+        } else {
+            setPoints(points)
+            console.log(points)
+            history.push({
+                pathname: '/success',
+                state: {
+                    points: points
+                }
+            })
         }
-
-        setFlag(Math.floor(Math.random() * words.length) !== flag ? Math.floor(Math.random() * words.length) : 0)
-        setWord(words[flag])
-        document.getElementById('test-input').value = null
-        document.getElementById('noteTextArea').value = null
-
-        if(e.target.value === null || document.getElementById('test-input').classList.contains('correct')) {
-            document.getElementById('test-input').classList.remove('border-success', 'outline-success', 'correct')
-        } 
         
     }
 
@@ -90,32 +109,39 @@ const WordTest = (props) => {
     }
 
     const handleLearn = () => {
-        learning.forEach(element => {
-            if(element.count === 3) {
-                console.log(learning, words)
-                axios.post(`${server}/api/user/learn/${element.word}`, {
-                    token: user.token,
-                    notes: element.notes
-                })
-                .then((res) => {
-                    console.log(res)
-                }).then((result) => {
-                    handleNote(element)
-                    updateUser()
-                })
-                .catch((err) => {
-                    console.log(err)
-                })
-                
-            }
+        if (words.length !== 0) {
+            learning.forEach(element => {
+                if(element.count === 3) {
+                    console.log(learning, words)
+                    axios.post(`${server}/api/user/learn/${element.word}`, {
+                        token: user.token,
+                        notes: element.notes
+                    })
+                    .then((res) => {
+                        console.log(res)
+                        let index = words.findIndex(found => found.base === res.data.learned.base)
+                        words.splice(index, 1)
+                        setWords(words)
+                        index = learning.indexOf(element)
+                        learning.splice(index, 1)
+                        setLearning(learning)
+                        setProgress(0)
 
-            words.pop(words.find(found => found.base === element.word))
-            learning.pop(element)
-            
-            setFlag(Math.floor(Math.random() * words.length) !== flag ? Math.floor(Math.random() * words.length) : 0)
-            setWord(words[flag])
-        });
-        
+                        console.log(words, learning, 'new eord learned')
+                    }).then(() => {
+                        handleNote(element)
+                        updateUser()
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+                    
+                }
+
+                setFlag(Math.floor(Math.random() * words.length) !== flag ? Math.floor(Math.random() * words.length) : 0)
+                setWord(words[flag])
+            });
+        } 
     }
 
     const handleAddNote = (e) => {
@@ -132,24 +158,36 @@ const WordTest = (props) => {
         })
 
         document.getElementById('noteTextArea').value = null
-        console.log(learning)
     }
 
     useEffect(() => {
         updateUser()
-        learning.map((element) => {
-            if(element.count === 3) {
-                handleLearn()
-                console.log('new word learned')
-            }
+        words.map(word => {
+            points += word.points
         })
-    }, [handleLearn(), learning, updateUser()])
+        props.points !== 0 ? setPoints(props.points) : setPoints(points) 
+        
+    }, [])
 
     
 
     return (
         <div>
-            
+            <label 
+                htmlFor="progress-range" 
+                className="form-label mb-0"> 🏆 You've got this! Keep going  </label>
+                <div className='d-flex flex-column justify-contetn-end align-items-end'> 
+                    <div className="progress w-100">
+                        <div 
+                            className="progress-bar-animated progress-bar-striped bg-primary"
+                            style={{width: (progress / 3) * 100 + '%'}}
+                            role="progressbar" 
+                            aria-valuenow={progress} 
+                            aria-valuemin="0" 
+                            aria-valuemax="3">    
+                        </div>
+                    </div>
+                </div>
             <div className='vertical-align-center d-flex flex-row mb-1'>
                 <label 
                     id='test-label'
@@ -219,6 +257,19 @@ const WordTest = (props) => {
                 type='submit'
                 className='btn btn-primary m-2'
                 onClick={(e) => handleNext(e)}> Next </button>
+            {/* <button
+                type='submit'
+                className='btn btn-primary m-2'
+                onClick={(e) =>{ 
+                    setPoints(points)
+                    console.log(points)
+                    history.push({
+                        pathname: '/success',
+                        state: {
+                            points: points
+                        }
+                    })}}> 
+                Skip to finish </button> */}
         </div>
     )
 }

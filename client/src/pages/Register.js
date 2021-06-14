@@ -55,8 +55,22 @@ const Register = () => {
                             placeholder='Name'
                             onChange={(e) => {
                                 setName(e.target.value)
+                                if(e.target.value.length < 4) {
+                                    document.getElementById('user-input').classList.remove('is-valid') 
+                                    document.getElementById('user-input').classList.add('is-invalid')
+                                }
+                                else {
+                                    document.getElementById('user-input').classList.remove('is-invalid')
+                                    document.getElementById('user-input').classList.add('is-valid')
+                                }
                             }}/>
                         <label htmlFor="name-input">Name</label>
+                        <div className="valid-feedback">
+                            Wonderful name! 💜  
+                        </div>
+                        <div className="invalid-feedback">
+                            Name should be at lead 4 characters long 😔
+                        </div>
                     </div>
                     <div className='email-wrapper d-flex flex-column form-floating mb-3'>
                         <Form.Control 
@@ -68,8 +82,22 @@ const Register = () => {
                             placeholder='name@example.com'
                             onChange={(e) => {
                                 setUsername(e.target.value)
+                                if(e.target.value.includes('@gmail.com') || e.target.value.includes('@yahoo.com') || e.target.value.includes('@stud.ase.ro')) {
+                                    document.getElementById('email-input').classList.add('is-valid') 
+                                    document.getElementById('email-input').classList.remove('is-invalid')
+                                }
+                                else {
+                                    document.getElementById('email-input').classList.add('is-invalid')
+                                    document.getElementById('email-input').classList.remove('is-valid')
+                                }
                             }}/>
                         <label htmlFor="email-input">Email address</label>
+                        <div className="valid-feedback">
+                            Looks good! 👀 
+                        </div>
+                        <div className="invalid-feedback">
+                            Invalid email address 😔
+                        </div>
                     </div>
                     <div className='pass-wrapper form-floating mb-3'>
                         <Form.Control 
@@ -81,8 +109,22 @@ const Register = () => {
                             placeholder='Password'
                             onChange={(e) => {
                                 setPassword(e.target.value)
+                                if(e.target.value.length < 5) {
+                                    document.getElementById('pass-input').classList.remove('is-valid') 
+                                    document.getElementById('pass-input').classList.add('is-invalid')
+                                }
+                                else {
+                                    document.getElementById('pass-input').classList.remove('is-invalid')
+                                    document.getElementById('pass-input').classList.add('is-valid')
+                                }
                             }}/>
                         <label htmlFor="pass-input">Password</label>
+                        <div className="valid-feedback">
+                            Looks good! 👀 
+                        </div>
+                        <div className="invalid-feedback">
+                            Password should be at leas 5 characters long 😔
+                        </div>
                     </div>
                     <button className='btn btn-primary'
                     type='submit'

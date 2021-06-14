@@ -1,5 +1,5 @@
 import axios from "axios"
-import { useEffect, useState } from "react"
+import { useEffect, useState, setState } from "react"
 import { server } from './GlobalVariables'
 import Login from "./Login"
 import Card from '../components/Card'
@@ -13,6 +13,7 @@ const Home = () => {
     const [words, setWords] = useState([])
     const history = useHistory()
     const [allWords, setAllWords] = useState([])
+    const [admins, setAdmins] = useState([])
     const [users, setUsers] = useState([])
 
     const [base, setBase] = useState('')
@@ -36,7 +37,7 @@ const Home = () => {
         .catch((err) => {
             console.log(err)
         })
-        setTimeout(() => document.getElementById('learn-btn').style.visibility = 'visible', 3000)
+        setTimeout(() => document.getElementById('learn-btn').style.visibility = 'visible', 2000)
     }
 
     const handleAddWords = (e) => {
@@ -107,14 +108,16 @@ const Home = () => {
         axios.post(`${server}/api/user/delete`, {
             email: user.email
         }).then((res) => {
-            setUsers(res.data)
+                setAdmins(res.data.filter(user => user.role === 'admin' && user.email !== JSON.parse(localStorage.getItem('user')).email))
+                setUsers(res.data.filter(user => user.role === 'user'))
         }).catch((err) => {
             console.error(err)
         })
 
         axios.get(`${server}/api/user`)
         .then((res) => {
-            setUsers(res.data)
+                setAdmins(res.data.filter(user => user.role === 'admin' && user.email !== JSON.parse(localStorage.getItem('user')).email))
+                setUsers(res.data.filter(user => user.role === 'user'))
         })
         .catch((err) => {
             console.error(err)
@@ -126,7 +129,8 @@ const Home = () => {
         axios.post(`${server}/api/user/delete`, {
             email: user.email
         }).then((res) => {
-            setUsers(res.data)
+                setAdmins(res.data.filter(user => user.role === 'admin' && user.email !== JSON.parse(localStorage.getItem('user')).email))
+                setUsers(res.data.filter(user => user.role === 'user'))
         }).catch((err) => {
             console.error(err)
         })
@@ -141,7 +145,8 @@ const Home = () => {
             email: user.email
         })
         .then((res) => {
-            setUsers(res.data)
+                setAdmins(res.data.filter(user => user.role === 'admin' && user.email !== JSON.parse(localStorage.getItem('user')).email))
+                setUsers(res.data.filter(user => user.role === 'user'))
         })
         .catch((err) => {
             console.log(err)
@@ -154,7 +159,8 @@ const Home = () => {
             email: user.email
         })
         .then((res) => {
-            setUsers(res.data)
+                setAdmins(res.data.filter(user => user.role === 'admin' && user.email !== JSON.parse(localStorage.getItem('user')).email))
+                setUsers(res.data.filter(user => user.role === 'user'))
         })
         .catch((err) => {
             console.log(err)
@@ -162,6 +168,7 @@ const Home = () => {
     }
 
     useEffect( () => {
+
         axios.get(`${server}/api/words/`)
         .then((res) => {
             setAllWords(res.data)
@@ -171,13 +178,18 @@ const Home = () => {
         })
 
         axios.get(`${server}/api/user`)
-        .then((res) => {
-            setUsers(res.data)
-        })
+        .then(res => {
+                setAdmins(res.data.filter(user => user.role === 'admin' && user.email !== JSON.parse(localStorage.getItem('user')).email))
+                setUsers(res.data.filter(user => user.role === 'user'))
+            }
+        )
         .catch((err) => {
             console.error(err)
         })
+
     }, [])
+
+    
 
     return (
         <div className='containder-fluid d-grid orientation-vertical'>  
@@ -274,13 +286,75 @@ const Home = () => {
                                 </button>
                             </div>
                         </div>
+                        <div className='row d-flex flex-row justify-content-center flex-wrap mt-4'>
+                            <div className='col m-2'>
+                                {
+                                    
+                                    admins.map((user) => (
+                                         <div id={uuid()} className='container-fluid bg-light text-dark rounded p-4 m-2'>
+                                                <h4 className='col'> ⚙️ {user.name} <span> </span>
+                                                        <span className="badge rounded-pill bg-warning text-dark"> 🕵️ {user.role} </span>
+                                                </h4>
+                                                <div className='row'> 
+                                                    <span className='col'> 📮 {user.email} </span>
+                                                </div>
+                                                <div className='row'> 
+                                                    <span className='col text-dark'> 📅 <span> </span>
+                                                        <span className='text-primary font-weight-large'>
+                                                            {new Date(user.date).toDateString()} 
+                                                        </span> 
+                                                    </span>
+                                                </div>
+                                                <div className='row'>
+                                                    <button 
+                                                        className='btn btn-sm btn-outline-info col m-2 me-1'
+                                                        onClick={(e) => {handleMakeUser(e, user)}}> 
+                                                        Make user
+                                                    </button>
+                                                </div> 
+                                            </div>  
+                                    ))
+                                }
+                                {
+                                    users.map((user) => (
+                                        <div id={uuid()} className='container-fluid d-grid bg-light text-dark rounded p-4 m-2'>
+                                                <h4 className='col'> 🧠 {user.name} <span> </span>
+                                                        <span className="badge rounded-pill bg-primary text-light"> 🥇 {user.score} points </span>
+                                                </h4>
+                                                <div className='row'> 
+                                                    <span className='col'> 📮 {user.email} <br/> 📚 {user.knownWords.length} words learned<br/>
+                                                        <span className='col text-dark'> 📅 <span> </span>
+                                                            <span className='text-primary'> 
+                                                                {new Date(user.date).toDateString()} 
+                                                            </span> 
+                                                        </span>
+                                                    </span>
+                                                    <div className='row mt-2'>
+                                                        <button 
+                                                            className='btn btn-sm btn-outline-danger col ms-4 m-2 me-1'
+                                                            onClick={(e) => {handleDelete(e, user)}}> 
+                                                            Remove user
+                                                        </button>
+                                                        <button 
+                                                            className='btn btn-sm btn-outline-warning col m-2 me-1'
+                                                            onClick={(e) => {handleAdmin(e, user)}}> 
+                                                            Make admin
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    ))
+                                }                 
+                                    
+                                    
+                            </div>
                         
-                    <div className='row d-flex flex-row justify-content-evenly flex-wrap mt-4'> 
+                    {/* <div className='row d-flex flex-row justify-content-evenly flex-wrap mt-4'> 
                         <div className='col m-2'> 
-                            { users.map((user) => (
+                            { allUsers.length !== 0 && allUsers.map((user) => (
                                 <div id={uuid()} className='row'>
-                                    { user.email ===JSON.parse(localStorage.getItem('user')).email ? (
-                                        users.pop(user)
+                                    { user.email === JSON.parse(localStorage.getItem('user')).email ? (
+                                        allUsers.pop(user)
                                     ) : (
                                     <> 
                                         { user.role === 'admin' ? (
@@ -333,13 +407,14 @@ const Home = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                        )}       
-                                    </> 
-                                    )}
-                                </div>
-                                )
-                            )}      
-                        </div>
+                                            )}       
+                                        </> 
+                                        )}
+                                    </div>
+                                    )
+                                )}      
+                            </div>
+                        </div> */}
                         <Form 
                             id='add-form'
                             style={{visibility: 'hidden'}}
@@ -393,8 +468,9 @@ const Home = () => {
                             }}> Insert </button>
                         </Form>
                     </div>
-                </div>
+                    </div>
                 </>
+                
             )}
                
         </>

@@ -36,11 +36,11 @@ const controller = {
         if(error) return res.status(400).send(error.details[0].message)
         
         const user = await User.findOne({ email: req.body.email })
-        if(!user) return res.status(400).send(`Email doesn't exist!`)
+        if(!user) return res.status(401).send(`Email doesn't exist!`)
 
         //password is correct       
         const validPass = await bcrypt.compare(req.body.password, user.password)
-        if(!validPass) return res.status(400).send({"message": `Invalid password from route!`, "pass": validPass, "from body": req.body.password, "user pass": user.password})
+        if(!validPass) return res.status(402).send({"message": `Invalid password from route!`, "pass": validPass, "from body": req.body.password, "user pass": user.password})
 
         //create and assign token
         const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET)

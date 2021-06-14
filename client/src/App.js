@@ -12,6 +12,7 @@ import Footer from './components/Footer';
 import Profile from './pages/Profile';
 import Learn from './pages/Learn';
 import AllWords from './pages/AllWords';
+import Success from './pages/Success';
 
 const App = () => {
 
@@ -37,6 +38,7 @@ const App = () => {
               <Route exact path='/profile' component={Profile}></Route>
               <Route exact path='/learn' component={Learn}></Route>
               <Route exact path='/words' component={AllWords}></Route>
+              <Route exact path='/success' component={Success}></Route>
             </Switch>
 
         <Footer/>
