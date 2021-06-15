@@ -1,6 +1,8 @@
 const User = require('../models/user')
 const Word = require('../models/word')
 const bcrypt = require('bcryptjs')
+const { supermemo } = require('supermemo')
+const dayjs = require('dayjs')
 
 const controller = {
 
@@ -57,20 +59,42 @@ const controller = {
                     notes: req.body.notes
                 })
 
+                const {interval, repetition, efactor} = supermemo({...learned, interval: 0, repetition: 0, efactor: 2.5}, req.body.grade)
+                console.log(repetition)
+                const dueDate = dayjs(Date.now()).add(interval, 'day').toISOString();
+
+                const flashcard = {
+                    _id: word._id,
+                    base: word.base,
+                    target: word.target,
+                    points: word.points,
+                    notes: req.body.notes,
+                    dueDate: dueDate,
+                    interval: interval, 
+                    repetition: repetition, 
+                    efactor: efactor
+                }
+
                 if(!known.includes(learned.base)) {
-                    user.knownWords.push(learned)
+                    user.knownWords.push(flashcard)
                     user.score += learned.points
                     await user.save()
-                    res.status(200).send({user: user, learned: learned, known: known})
+                    res.status(200).send({user: user, learned: flashcard, known: known})
                 } else {
                     const known = user.knownWords.find(word => word.base === req.params.base)
-                    const edited = new Word({
+
+                    const edited = {
                         _id: known._id,
                         base: known.base,
                         target: known.target,
                         points: known.points,
-                        notes: req.body.notes
-                    })
+                        notes: req.body.notes,
+                        dueDate: dueDate,
+                        interval: interval, 
+                        repetition: repetition, 
+                        efactor: efactor
+
+                    }
 
                     user.knownWords.pop(known)
                     user.knownWords.push(edited)
@@ -113,7 +137,7 @@ const controller = {
                     base: known.base,
                     target: known.target,
                     points: known.points,
-                    notes: req.body.notes
+                    notes: req.body.notes,
                 })
                 user.knownWords[user.knownWords.indexOf(known)] = edited
                 // user.knownWords.push(edited)
@@ -147,7 +171,7 @@ const controller = {
         User.deleteOne({ email: req.body.email })
         .then(async () => {
             const users = await User.find()
-            res.status(200).send({users: users})
+            res.status(200).send(users)
         })
         .catch((err) => {
             res.status(404).send(err)

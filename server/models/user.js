@@ -36,6 +36,26 @@ const userSchema = new mongoose.Schema({
         notes: {
             type: String, 
             default: null
+        },
+        dueDate: {
+            type: String, 
+            required: true,
+            default: Date.now() + 1 
+        }, 
+        interval: {
+            type: Number,
+            required: true, 
+            default: 0
+        }, 
+        repetition: {
+            type: Number,
+            required: true, 
+            default: 0
+        },
+        efactor: {
+            type: Number,
+            required: true, 
+            default: 2.5
         }
     }], 
     score: {
@@ -49,7 +69,8 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         default: 'user'
-    }
+    },
+
     
 })
 

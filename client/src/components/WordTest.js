@@ -26,17 +26,18 @@ const WordTest = (props) => {
     }
 
     const handleNote = (element) => { 
-        axios.post(`${server}/api/user/notes/${word.base}`, {
-            notes: element.notes,
-            token: user.token
-        })
-            .then((res) => {
-                console.log(res)
+        if(element.notes) {
+            axios.post(`${server}/api/user/notes/${word.base}`, {
+                notes: element.notes,
+                token: user.token
             })
-            .catch((err) => {
-                console.error(err)
-            })
-
+                .then((res) => {
+                    console.log(res)
+                })
+                .catch((err) => {
+                    console.error(err)
+                })
+        }
     }
 
     const handleNext = (e) => {
@@ -58,8 +59,6 @@ const WordTest = (props) => {
                     if(element.count === 3) {
                         console.log('count === 3')
                         handleLearn()
-                        setFlag(Math.floor(Math.random() * words.length) !== flag ? Math.floor(Math.random() * words.length) : 0)
-                        setWord(words[flag])
                     }
                     })
 
@@ -115,19 +114,20 @@ const WordTest = (props) => {
                     console.log(learning, words)
                     axios.post(`${server}/api/user/learn/${element.word}`, {
                         token: user.token,
-                        notes: element.notes
+                        notes: element.notes,
+                        grade: Math.floor(Math.random() * 5)
                     })
                     .then((res) => {
                         console.log(res)
-                        let index = words.findIndex(found => found.base === res.data.learned.base)
-                        words.splice(index, 1)
+                        words.splice(words.findIndex(found => found.base === element.word), 1)
                         setWords(words)
-                        index = learning.indexOf(element)
-                        learning.splice(index, 1)
+                        learning.splice(learning.indexOf(element), 1)
                         setLearning(learning)
                         setProgress(0)
 
-                        console.log(words, learning, 'new eord learned')
+                        console.log(words, learning, 'new word learned')
+
+
                     }).then(() => {
                         handleNote(element)
                         updateUser()
@@ -137,9 +137,6 @@ const WordTest = (props) => {
                     })
                     
                 }
-
-                setFlag(Math.floor(Math.random() * words.length) !== flag ? Math.floor(Math.random() * words.length) : 0)
-                setWord(words[flag])
             });
         } 
     }
@@ -166,6 +163,15 @@ const WordTest = (props) => {
             points += word.points
         })
         props.points !== 0 ? setPoints(props.points) : setPoints(points) 
+
+        if(words.lenght === 0) {
+            history.push({
+                pathname: '/success',
+                state: {
+                    points: points
+                }
+            })
+        }
         
     }, [])
 

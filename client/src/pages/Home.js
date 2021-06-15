@@ -244,7 +244,7 @@ const Home = () => {
                 </>
             ) : (
                 <>
-                    <div className='d-grid position-relative p-3'>
+                    <div key={uuid()} className='d-grid position-relative p-3'>
                         <div className='row'>
                             <div className='col'> Welcome,
                                 <h3> {user.name} <span> </span>
@@ -286,12 +286,15 @@ const Home = () => {
                                 </button>
                             </div>
                         </div>
-                        <div className='row d-flex flex-row justify-content-center flex-wrap mt-4'>
-                            <div className='col m-2'>
+                        <div hey={uuid()} className='row d-flex flex-row justify-content-center flex-wrap mt-4'>
+                            <div className='col m-2'
+                                style={{maxWidth: 550 + 'px'}}>
                                 {
                                     
                                     admins.map((user) => (
-                                         <div id={uuid()} className='container-fluid bg-light text-dark rounded p-4 m-2'>
+                                         <div id={uuid()} 
+                                            className='container-fluid bg-light text-dark rounded p-4 m-2'
+                                            style={{maxWidth: 550 + 'px'}}>
                                                 <h4 className='col'> ⚙️ {user.name} <span> </span>
                                                         <span className="badge rounded-pill bg-warning text-dark"> 🕵️ {user.role} </span>
                                                 </h4>
@@ -308,6 +311,7 @@ const Home = () => {
                                                 <div className='row'>
                                                     <button 
                                                         className='btn btn-sm btn-outline-info col m-2 me-1'
+                                                        
                                                         onClick={(e) => {handleMakeUser(e, user)}}> 
                                                         Make user
                                                     </button>
@@ -317,107 +321,42 @@ const Home = () => {
                                 }
                                 {
                                     users.map((user) => (
-                                        <div id={uuid()} className='container-fluid d-grid bg-light text-dark rounded p-4 m-2'>
-                                                <h4 className='col'> 🧠 {user.name} <span> </span>
-                                                        <span className="badge rounded-pill bg-primary text-light"> 🥇 {user.score} points </span>
-                                                </h4>
-                                                <div className='row'> 
-                                                    <span className='col'> 📮 {user.email} <br/> 📚 {user.knownWords.length} words learned<br/>
-                                                        <span className='col text-dark'> 📅 <span> </span>
-                                                            <span className='text-primary'> 
-                                                                {new Date(user.date).toDateString()} 
-                                                            </span> 
-                                                        </span>
-                                                    </span>
-                                                    <div className='row mt-2'>
-                                                        <button 
-                                                            className='btn btn-sm btn-outline-danger col ms-4 m-2 me-1'
-                                                            onClick={(e) => {handleDelete(e, user)}}> 
-                                                            Remove user
-                                                        </button>
-                                                        <button 
-                                                            className='btn btn-sm btn-outline-warning col m-2 me-1'
-                                                            onClick={(e) => {handleAdmin(e, user)}}> 
-                                                            Make admin
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                    ))
-                                }                 
-                                    
-                                    
-                            </div>
-                        
-                    {/* <div className='row d-flex flex-row justify-content-evenly flex-wrap mt-4'> 
-                        <div className='col m-2'> 
-                            { allUsers.length !== 0 && allUsers.map((user) => (
-                                <div id={uuid()} className='row'>
-                                    { user.email === JSON.parse(localStorage.getItem('user')).email ? (
-                                        allUsers.pop(user)
-                                    ) : (
-                                    <> 
-                                        { user.role === 'admin' ? (
-                                            <div id={uuid()} className='container-fluid bg-light text-dark rounded p-4 m-2'>
-                                                <h4 className='col'> ⚙️ {user.name} <span> </span>
-                                                        <span className="badge rounded-pill bg-warning text-dark"> 🕵️ {user.role} </span>
-                                                </h4>
-                                                <div className='row'> 
-                                                    <span className='col'> 📮 {user.email} </span>
-                                                </div>
-                                                <div className='row'> 
+                                        <div id={uuid()} 
+                                            className='container-fluid d-grid bg-light text-dark rounded p-4 m-2'
+                                            style={{maxWidth: 550 + 'px'}}>
+                                            <h4 className='col'> 🧠 {user.name} <span> </span>
+                                                    <span className="badge rounded-pill bg-primary text-light"> 🥇 {user.score} points </span>
+                                            </h4>
+                                            <div className='row'> 
+                                                <span className='col'> 📮 {user.email} <br/> 📚 {user.knownWords.length} words learned<br/>
                                                     <span className='col text-dark'> 📅 <span> </span>
-                                                        <span className='text-primary font-weight-large'>
+                                                        <span className='text-primary'> 
                                                             {new Date(user.date).toDateString()} 
                                                         </span> 
                                                     </span>
-                                                </div>
-                                                <div className='row'>
+                                                </span>
+                                                <div className='row mt-2'>
                                                     <button 
-                                                        className='btn btn-sm btn-outline-info col m-2 me-1'
-                                                        onClick={(e) => {handleMakeUser(e, user)}}> 
-                                                        Make user
+                                                        className='btn btn-sm btn-outline-danger col ms-4 m-2 me-1'
+                                                        onClick={(e) => {handleDelete(e, user)}}> 
+                                                        Remove user
                                                     </button>
-                                                </div> 
-                                            </div>  
-                                        ) : (
-                                            <div id={uuid()} className='container-fluid d-grid bg-light text-dark rounded p-4 m-2'>
-                                                <h4 className='col'> 🧠 {user.name} <span> </span>
-                                                        <span className="badge rounded-pill bg-primary text-light"> 🥇 {user.score} points </span>
-                                                </h4>
-                                                <div className='row'> 
-                                                    <span className='col'> 📮 {user.email} <br/> 📚 {user.knownWords.length} words learned<br/>
-                                                        <span className='col text-dark'> 📅 <span> </span>
-                                                            <span className='text-primary'> 
-                                                                {new Date(user.date).toDateString()} 
-                                                            </span> 
-                                                        </span>
-                                                    </span>
-                                                    <div className='row mt-2'>
-                                                        <button 
-                                                            className='btn btn-sm btn-outline-danger col ms-4 m-2 me-1'
-                                                            onClick={(e) => {handleDelete(e, user)}}> 
-                                                            Remove user
-                                                        </button>
-                                                        <button 
-                                                            className='btn btn-sm btn-outline-warning col m-2 me-1'
-                                                            onClick={(e) => {handleAdmin(e, user)}}> 
-                                                            Make admin
-                                                        </button>
-                                                    </div>
+                                                    <button 
+                                                        className='btn btn-sm btn-outline-warning col m-2 me-1'
+                                                        onClick={(e) => {handleAdmin(e, user)}}> 
+                                                        Make admin
+                                                    </button>
                                                 </div>
                                             </div>
-                                            )}       
-                                        </> 
-                                        )}
-                                    </div>
-                                    )
-                                )}      
+                                        </div>
+                                    ))
+                                }                 
+                                               
                             </div>
-                        </div> */}
+
                         <Form 
                             id='add-form'
-                            style={{visibility: 'hidden'}}
+                            style={{visibility: 'hidden', maxWidth: 300 + 'px'}}
                             className='col m-2 p-4'>
                             <h4> Add a new word </h4>    
                             <div className='user-wrapper d-flex flex-column form-floating mb-3'>

@@ -17,7 +17,8 @@ const wordSchema = new mongoose.Schema({
     notes: {
         type: String,
         default: null
-    }
+    },
+    
 })
 
 module.exports = mongoose.model('Word', wordSchema)

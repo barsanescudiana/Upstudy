@@ -22,7 +22,7 @@ const AllWords = (props) => {
     }
 
     useEffect(() => {
-
+        console.log(words)
     }, [])
 
     return(
@@ -40,7 +40,7 @@ const AllWords = (props) => {
             <div className='d-grid'>
                 {   
                     words.map(element => ( 
-                        <div id={element._id} className='row'> 
+                        <div key={element._id} className='row'> 
                             <div id={uuid()} className='word-card rounded bg-light m-2 p-2 col'>
                                 <h5 className='text-dark col'> ✔️ {element.base} ▪ {element.target} 
                                     <span id={uuid()} className='col p-0 text-light badge bg-secondary m-1 p-2 rounded-pill'> 🥇 {element.points} </span> 
