@@ -1,7 +1,5 @@
 const mongoose = require('mongoose')
-const bcrypt = require('bcryptjs')
-const Word = require('../models/word')
-const jwt = require('jsonwebtoken')
+const dayjs = require('dayjs')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -40,7 +38,7 @@ const userSchema = new mongoose.Schema({
         dueDate: {
             type: String, 
             required: true,
-            default: Date.now() + 1 
+            default: dayjs(Date.now()).add(1, 'day').toDate()
         }, 
         interval: {
             type: Number,
