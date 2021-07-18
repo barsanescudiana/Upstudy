@@ -1,19 +1,32 @@
 
 import {useEffect, useState} from 'react'
 import { useHistory } from 'react-router'
+import axios from 'axios'
+import {server} from './GlobalVariables'
 
 const Success = (props) => {
 
-    const [user, ] = useState(JSON.parse(localStorage.getItem('user')))
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
     const [points, ] = useState(props.location.state.points)
     const history = useHistory()
     
+    useEffect(() => {
+        axios.get(`${server}/api/user/${user.email}`)
+        .then(res => {
+            localStorage.setItem('user', JSON.stringify(res.data))
+            setUser(res.data)
+        })
+        .catch(err => {
+            console.error(err)
+        })
+    })
+
     const handleGotIt = (e) => {
         e.preventDefault()
         history.push({
             pathname: '/profile',
             state: {
-                user: user
+                user: localStorage.getItem('user')
             }
         })
     }
@@ -23,15 +36,10 @@ const Success = (props) => {
         history.push({
             pathname: '/',
             state: {
-                user: user
+                user: localStorage.getItem('user')
             }
         })
     }
-
-    // useEffect(() => {
-    //     console.log(props.location.state)
-    //     console.log(points)
-    // }, [])
 
     return (
         <div className='d-flex flex-column justify-content-center align-items-center m-5'>

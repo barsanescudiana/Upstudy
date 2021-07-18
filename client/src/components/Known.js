@@ -3,6 +3,7 @@ import { useHistory} from 'react-router'
 import axios from 'axios'
 import {server} from '../pages/GlobalVariables'
 import uuid from 'react-uuid'
+import Form from 'react-bootstrap/Form'
 
 const Known = (props) => {
 
@@ -63,7 +64,7 @@ const Known = (props) => {
             { words.length === 0 ? (
                 <>
                 
-                    <p> You have not learned any words yet. </p>
+                    <p className='h3 text-center' > You have not learned any words yet. 🔒 </p>
                     <button 
                         type='button' 
                         className='btn btn-primary'
@@ -77,20 +78,21 @@ const Known = (props) => {
                     <label 
                         htmlFor="progress-range" 
                         className="form-label mb-0"> This is your progress </label>
-                    <div className='d-flex flex-column justify-contetn-end align-items-end'> 
+                    <div className='d-flex flex-column justify-content-end align-items-end'> 
                         <div className="progress w-100">
                             <div 
                                 className="progress-bar-animated progress-bar-striped bg-primary"
-                                style={{width: (user.knownWords.length / 100) * 100 + '%'}}
+                                style={{width: (user.knownWords.length / 1000) * 100 + '%'}}
                                 role="progressbar" 
                                 aria-valuenow={user.knownWords.length} 
                                 aria-valuemin="0" 
                                 aria-valuemax="100">    
                             </div>
                         </div>
-                        <span className='text-secondary align-content-end text-align-end text-sm'> {user.knownWords.length}/100
+                        <span className='text-secondary align-content-end text-align-end text-sm'> {user.knownWords.length}/1000
                             <small className="text-muted"> words learned so far</small> 
                         </span>
+                        
                             <button 
                                 type='button' 
                                 className='btn btn-primary'
@@ -99,10 +101,30 @@ const Known = (props) => {
                                     history.push('/')
                             }}> 📚 Let's learn!</button>
                     </div>
+
+                    <div className='d-flex flex-column justify-content-center align-items-center m-3'>
+                        <div className="input-group"> 
+                            <input 
+                                type="text" 
+                                className="form-control" 
+                                placeholder="Search"
+                                onChange={(e) => {
+                                    if(e.target.value)
+                                        setWords(words.filter(word => word.base.includes(e.target.value)))
+                                    else 
+                                        setWords(props.user.knownWords)
+                                }}/>
+                            <button 
+                                className="btn btn-outline-secondary" 
+                                type="button" 
+                                id="button-addon2" 
+                                disabled> <i class="fas fa-search"></i></button>
+                        </div>
+                    </div>
                     
                     {   words.map(element => ( 
                     
-                        <div id={uuid()} className='word-card rounded bg-light m-2 p-2'>
+                        <div id={uuid()} key={uuid()} className='row word-card-profile rounded bg-light m-2 p-2'>
                         
                             <h3 className='text-dark col '> ✔️ {element.base} ▪ {element.target} 
                                 <span id={uuid()} className='col p-0 text-light badge bg-secondary m-1 p-2 rounded-pill'> 🥇 {element.points} </span> 
@@ -124,12 +146,6 @@ const Known = (props) => {
                                             updateUser()
                                         }}
                                         ></textarea>
-                                    {/* <a 
-                                        href='/' 
-                                        className='text-primary'
-                                        onClick={(e) => { 
-                                            handleCreateNote(e, element)}
-                                        }> Add new 📓  </a> */}
                                 </div>
                             ) : (
                                 <div>

@@ -13,6 +13,9 @@ import Profile from './pages/Profile';
 import Learn from './pages/Learn';
 import AllWords from './pages/AllWords';
 import Success from './pages/Success';
+import Reading from './pages/Reading';
+import Tests from './pages/Tests';
+import Revision from './pages/Revision';
 
 const App = () => {
 
@@ -29,7 +32,7 @@ const App = () => {
   return (
     <>
       <Router>
-        <div className="App container-fluid d-block mb-5 p-5">
+        <div className="App d-grid mb-5 p-5 justify-content-center align-items-center">
           
             <Switch>
               <Route exact path='/' component={Home}></Route>
@@ -39,6 +42,9 @@ const App = () => {
               <Route exact path='/learn' component={Learn}></Route>
               <Route exact path='/words' component={AllWords}></Route>
               <Route exact path='/success' component={Success}></Route>
+              <Route path='/reading/:title' component={Reading}></Route>
+              <Route exact path='/test' component={Tests}></Route>
+              <Route exact path='/revision' component={Revision}></Route>
             </Switch>
 
         <Footer/>

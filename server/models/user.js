@@ -42,19 +42,49 @@ const userSchema = new mongoose.Schema({
         }, 
         interval: {
             type: Number,
-            required: true, 
             default: 0
         }, 
         repetition: {
             type: Number,
-            required: true, 
             default: 0
         },
         efactor: {
             type: Number,
-            required: true, 
             default: 2.5
         }
+    }],
+    tests: [{
+        level: {
+            type: String, 
+            
+        }, 
+        title: {
+            type: String, 
+            
+        }, 
+        text: {
+            type: String,  
+        }, 
+        questions: [{
+            text: {
+                type: String, 
+                 
+            }, 
+            answers: [{
+                text: {
+                    type: String,
+                    
+                }, 
+                correct: {
+                    type: Boolean,
+                    
+                }
+            }]
+        }],
+        grade: {
+            type: Number,
+        },
+
     }], 
     score: {
         type: Number,

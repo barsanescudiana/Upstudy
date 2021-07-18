@@ -5,6 +5,7 @@ import { server } from './GlobalVariables'
 import Form from 'react-bootstrap/Form'
 import { useHistory } from 'react-router-dom'
 
+
 const Register = () => {
 
     const [username, setUsername] = useState()
@@ -39,6 +40,43 @@ const Register = () => {
         })
     }
 
+    const handleNameChange = (e) => {                                
+        setName(e.target.value)
+        if(e.target.value.length < 4) {
+            document.getElementById('user-input').classList.remove('is-valid') 
+            document.getElementById('user-input').classList.add('is-invalid')
+        }
+        else {
+            document.getElementById('user-input').classList.remove('is-invalid')
+            document.getElementById('user-input').classList.add('is-valid')
+        }
+    }
+
+    const handleEmailChange = (e) => {
+        setUsername(e.target.value)
+        if(e.target.value.includes('@gmail.com') || e.target.value.includes('@yahoo.com') || e.target.value.includes('@stud.ase.ro')) {
+            document.getElementById('email-input').classList.add('is-valid') 
+            document.getElementById('email-input').classList.remove('is-invalid')
+        }
+        else {
+            document.getElementById('email-input').classList.add('is-invalid')
+            document.getElementById('email-input').classList.remove('is-valid')
+        }
+    }
+
+    const handlePassChange = (e) => {                                 
+        setPassword(e.target.value)
+        if(e.target.value.length < 5) {
+            document.getElementById('pass-input').classList.remove('is-valid') 
+            document.getElementById('pass-input').classList.add('is-invalid')
+        }
+        else {
+            document.getElementById('pass-input').classList.remove('is-invalid')
+            document.getElementById('pass-input').classList.add('is-valid')
+        }
+
+    }
+
     return(
         <div className='d-flex flex-column justify-content-center align-items-center m-5'>
             <div className='form-wrapper position-relative shadow p-3 mb-5 bg-body 
@@ -53,17 +91,7 @@ const Register = () => {
                             className='form-control' 
                             id='user-input' 
                             placeholder='Name'
-                            onChange={(e) => {
-                                setName(e.target.value)
-                                if(e.target.value.length < 4) {
-                                    document.getElementById('user-input').classList.remove('is-valid') 
-                                    document.getElementById('user-input').classList.add('is-invalid')
-                                }
-                                else {
-                                    document.getElementById('user-input').classList.remove('is-invalid')
-                                    document.getElementById('user-input').classList.add('is-valid')
-                                }
-                            }}/>
+                            onChange={(e) => handleNameChange(e)}/>
                         <label htmlFor="name-input">Name</label>
                         <div className="valid-feedback">
                             Wonderful name! 💜  
@@ -80,17 +108,7 @@ const Register = () => {
                             className='form-control' 
                             id='email-input' 
                             placeholder='name@example.com'
-                            onChange={(e) => {
-                                setUsername(e.target.value)
-                                if(e.target.value.includes('@gmail.com') || e.target.value.includes('@yahoo.com') || e.target.value.includes('@stud.ase.ro')) {
-                                    document.getElementById('email-input').classList.add('is-valid') 
-                                    document.getElementById('email-input').classList.remove('is-invalid')
-                                }
-                                else {
-                                    document.getElementById('email-input').classList.add('is-invalid')
-                                    document.getElementById('email-input').classList.remove('is-valid')
-                                }
-                            }}/>
+                            onChange={(e) => handleEmailChange(e)}/>
                         <label htmlFor="email-input">Email address</label>
                         <div className="valid-feedback">
                             Looks good! 👀 
@@ -107,17 +125,7 @@ const Register = () => {
                             className='form-control' 
                             id='pass-input'
                             placeholder='Password'
-                            onChange={(e) => {
-                                setPassword(e.target.value)
-                                if(e.target.value.length < 5) {
-                                    document.getElementById('pass-input').classList.remove('is-valid') 
-                                    document.getElementById('pass-input').classList.add('is-invalid')
-                                }
-                                else {
-                                    document.getElementById('pass-input').classList.remove('is-invalid')
-                                    document.getElementById('pass-input').classList.add('is-valid')
-                                }
-                            }}/>
+                            onChange={(e) => handlePassChange(e)}/>
                         <label htmlFor="pass-input">Password</label>
                         <div className="valid-feedback">
                             Looks good! 👀 
@@ -130,7 +138,6 @@ const Register = () => {
                     type='submit'
                     onClick={(e) => {
                         handleSubmit(e)
-                        console.log(password)
                     }}> Sign up </button>
                      <p className='mt-2'> 
                        <small> Already have an account? <a href='/login' className='text-primary'> 

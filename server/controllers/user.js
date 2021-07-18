@@ -1,8 +1,10 @@
 const User = require('../models/user')
 const Word = require('../models/word')
+const Test = require('../models/test')
 const bcrypt = require('bcryptjs')
 const { supermemo } = require('supermemo')
 const dayjs = require('dayjs')
+const user = require('../models/user')
 
 const controller = {
 
@@ -40,6 +42,46 @@ const controller = {
         })
     },
 
+    revision: async(req, res) => {
+        const user = await User.findOne({token: req.body.token})
+        const word = await Word.findOne({base: req.params.base})
+
+        if(user) {
+            if(word) {
+                user.knownWords.splice(user.knownWords.indexOf(user.knownWords.find(item => item.base === word.base)), 1)
+                const learned = new Word({
+                    _id: word._id,
+                    base: word.base,
+                    target: word.target,
+                    points: word.points,
+                    notes: req.body.notes ? req.body.notes : null
+                })
+
+                const {interval, repetition, efactor} = supermemo({...learned, interval: 0, repetition: 0, efactor: 2.5}, req.body.grade)
+                const dueDate = dayjs(Date.now()).add(interval, 'day').toISOString();
+
+                const flashcard = {
+                    _id: word._id,
+                    base: word.base,
+                    target: word.target,
+                    points: word.points,
+                    notes: req.body.notes ? req.body.notes : null,
+                    dueDate: dueDate,
+                    interval: interval, 
+                    repetition: repetition, 
+                    efactor: efactor
+                }
+                user.knownWords.push(flashcard)
+                await user.save()
+                res.status(200).send(flashcard)
+            } else {
+                res.status(404).send('word not found')
+            }
+        } else {
+            res.status(404).send('user not found')
+        }
+    },
+
     learnWord: async (req, res) => {
         const user = await User.findOne({token: `${req.body.token}` })
         const word = await Word.findOne({base: `${req.params.base}`})
@@ -60,7 +102,6 @@ const controller = {
                 })
 
                 const {interval, repetition, efactor} = supermemo({...learned, interval: 0, repetition: 0, efactor: 2.5}, req.body.grade)
-                console.log(repetition)
                 const dueDate = dayjs(Date.now()).add(interval, 'day').toISOString();
 
                 const flashcard = {
@@ -93,10 +134,9 @@ const controller = {
                         interval: interval, 
                         repetition: repetition, 
                         efactor: efactor
-
                     }
 
-                    user.knownWords.pop(known)
+                    user.knownWords.splice(user.knownWords.findIndex(word => word.base === req.params.base), 1)
                     user.knownWords.push(edited)
                     await user.save()
                     res.status(200).send("word modified!")
@@ -106,14 +146,64 @@ const controller = {
         } else {
             res.status(404).send('user not found')
         }
+    },
 
-        // .then(async (user) => {
-        //     const found = await Word.findOne({base: `${req.params.base}`})
-        //     if(found) {
-        //         user.knownWords.push(found)
-        //         res.status(200).send(found)
-        //     }
-        // })
+    getTests: async(req, res) => {
+        const user = await User.findOne({email: req.params.email})
+        if (user) {
+            if(user.tests) {
+                res.status(200).send(user.tests)
+            } else {
+                res.status(404).send('tests not found')
+            }
+        } else {
+            res.status(404).send('user not found')
+        }
+    },
+
+    takeTest: async(req, res) => {
+        const user = await User.findOne({token: `${req.body.token}` })
+        const test = await Test.findOne({title: `${req.body.title}`})
+
+        if(user) {
+            if(test) {
+                const taken = {
+                    _id: test.id,
+                    text: test.text, 
+                    title: test.title, 
+                    questions: test.questions, 
+                    level: test.level, 
+                    grade: req.body.grade
+                }
+                if(user.tests.find(test => test.title === taken.title)) user.tests.splice(user.tests.indexOf(test => test.title === taken.title), 1)
+                user.tests.push(taken)
+                await user.save()
+                res.status(200).send(taken)
+            } else {
+                res.status(404).send('test not found')
+            }
+        } else {
+            res.status(404).send('user not found')
+        }
+    },
+
+    getAvailableTests: async(req, res) => {
+        const user = await User.findOne({email: req.params.email})
+        const tests = await Test.find()
+
+        if(tests) {
+            if(user) {
+                user.tests.map(item => {
+                    tests.splice(tests.indexOf(tests.find(test => test.title === item.title)), 1)
+                })
+                res.status(200).send(tests)
+            } else {
+                res.status(404).send('not found')
+            }
+        } else {
+            res.status(404).send('not found')
+        }
+
     },
 
     getByEmail: async (req, res) => {
@@ -176,7 +266,7 @@ const controller = {
         .catch((err) => {
             res.status(404).send(err)
         })
-    }
+    }, 
 }
 
 module.exports = controller

@@ -1,11 +1,12 @@
 import axios from "axios"
-import { useEffect, useState, setState } from "react"
+import { useEffect, useState, setState, useCallback } from "react"
 import { server } from './GlobalVariables'
-import Login from "./Login"
+import Landing from "./Landing"
 import Card from '../components/Card'
 import uuid from "react-uuid";
 import { useHistory } from "react-router"
 import Form from 'react-bootstrap/Form'
+import AdminBoard from "../components/AdminBoard"
 
 const Home = () => {
 
@@ -18,14 +19,27 @@ const Home = () => {
 
     const [base, setBase] = useState('')
     const [target, setTarget] = useState('')
-    const [points, setPoints] = useState('')
+    const [points, setPoints] = useState(0)
+
+    const current = new Date()
+    const [tests, setTests] = useState([])
 
     useEffect(() => {
         const loggedInUser = localStorage.getItem("user");
         if (loggedInUser) {
         const foundUser = JSON.parse(loggedInUser);
         setUser(foundUser);
+
+        axios.get(`${server}/api/user/tests/${foundUser.email}`)
+        .then((res) => {
+            setTests(res.data)
+        })
+        .catch(err => {
+            console.error(err)
+        })
         }
+
+        
     }, []);
 
     const handleCards = (e, userEmail) => {
@@ -48,6 +62,9 @@ const Home = () => {
         
         if(document.getElementById('add-form').style.visibility === 'visible') {
             setPoints(document.getElementById('points-input').value)
+            e.target.innerText = '⚙️ Hide add form'
+        } else {
+            e.target.innerText = '⚙️ Add new word'
         }
     }
 
@@ -167,8 +184,17 @@ const Home = () => {
         })
     }
 
-    useEffect( () => {
+    const handleTest = (e) => {
+        e.preventDefault()
+        history.push('/test')
+    }
 
+    const handleRevision = (e) => {
+        e.preventDefault()
+        history.push('/revision')
+    }
+
+    useEffect(() => {
         axios.get(`${server}/api/words/`)
         .then((res) => {
             setAllWords(res.data)
@@ -177,6 +203,7 @@ const Home = () => {
             console.error(err)
         })
 
+        if(localStorage.getItem('user'))
         axios.get(`${server}/api/user`)
         .then(res => {
                 setAdmins(res.data.filter(user => user.role === 'admin' && user.email !== JSON.parse(localStorage.getItem('user')).email))
@@ -189,12 +216,29 @@ const Home = () => {
 
     }, [])
 
+
+    const handleBaseChange = useCallback((e) => {
+        setBase(e.target.value)
+    }, [base])
+
+
+    const handleTargetChange = useCallback((e) => {
+        setTarget(e.target.value)
+    }, [target])
     
 
     return (
         <div className='containder-fluid d-grid orientation-vertical'>  
         {user ? (
             <>
+            <button 
+                type='button'
+                className='col btn btn-light rounded position-absolute end-0 top-0 m-3'
+                onClick={(e) => {
+                    handleLogOut(e)
+                }}>
+                ⚙️ Log out
+            </button>
             { user.role === 'user' ? (
                 <>
                     <div className='row position-relative p-3'>
@@ -203,10 +247,10 @@ const Home = () => {
                                 <span className="badge rounded-pill bg-light text-primary"> 🥇 {user.score} points </span>
                             </h3>
                         </div>
-                        <div className='row-ml'>
+                        <div className='row m-1'>
                             <button 
                                 type="button" 
-                                className="col btn btn-outline-primary"
+                                className="col btn btn-outline-primary m-2"
                                 onClick={(e) => {
                                     handleCards(e, user.email)
                                 }}>
@@ -220,6 +264,47 @@ const Home = () => {
                                 }}>
                                 🏷️ View profile 
                             </button>
+                            <button 
+                                type="button" 
+                                className="col position-relative btn btn-outline-primary m-2"
+                                onClick={(e) => {
+                                    handleTest(e)
+                                }}>
+                                📰 Take reading test
+                                {tests.length !== 0 ? (
+                                    <span className="position-absolute top-0 start-100 translate-middle p-1 bg-success rounded-pill text-dark word-count">
+                                        <strong>{(tests.length > 100 ? '99+' : tests.length) }</strong>
+                                        <span className="visually-hidden">Words that need revision</span>
+                                    </span>
+                                ) : (
+                                    <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger rounded-pill text-dark word-count">
+                                        <strong>{tests.length}</strong>
+                                        <span className="visually-hidden">Words that need revision</span>
+                                    </span>
+                                )}
+                            </button>
+                            <button 
+                                type="button" 
+                                className="col btn btn-outline-primary m-2 position-relative"
+                                onClick={(e) => {
+                                    handleRevision(e)
+                                }}>
+                                📅 Revision
+                                {user.knownWords.filter(word => new Date(word.dueDate) < current).length !== 0 ? (
+                                    <span className ="position-absolute top-0 start-100 translate-middle p-1 bg-danger rounded-pill text-dark word-count">
+                                        <strong>{user.knownWords.filter(word => new Date(word.dueDate) <= current).length > 100 ? '99+' : user.knownWords.filter(word => new Date(word.dueDate) < current).length}</strong>
+                                        <span className="visually-hidden">Words that need revision</span>
+                                    </span>
+                                ) : (
+                                    <span className="position-absolute top-0 start-100 translate-middle p-1 bg-warning rounded-pill text-dark word-count">
+                                        <strong>{user.knownWords.filter(word => new Date(word.dueDate) <= current).length}</strong>
+                                        <span className="visually-hidden">Words that need revision</span>
+                                    </span>
+                                )}
+
+                            </button>
+
+
 
                         </div>
                     </div>
@@ -243,178 +328,12 @@ const Home = () => {
                     </button>
                 </>
             ) : (
-                <>
-                    <div key={uuid()} className='d-grid position-relative p-3'>
-                        <div className='row'>
-                            <div className='col'> Welcome,
-                                <h3> {user.name} <span> </span>
-                                    <span className="badge rounded-pill bg-light text-primary"> 📚 {allWords.length} words stored </span>
-                                </h3>
-                            </div>
-                            <div className='col-ml'>
-                                <button 
-                                    type="button" 
-                                    className="col btn btn-outline-primary me-2"
-                                    onClick={(e) => {
-                                        handleAddWords(e, user.email)
-                                    }}>
-                                    ⚙️ Add new word
-                                </button>
-                                <button 
-                                    type="button" 
-                                    className="col btn btn-outline-primary m-2 ms-0"
-                                    onClick={(e) => {
-                                        handleViewWords(e)
-                                    }}>
-                                    🏷️ View all words
-                                </button>
-                                <button 
-                                    type='button'
-                                    className='col btn btn-light btn-sm rounded m-1'
-                                    onClick={(e) => {
-                                        handleLogOut(e)
-                                    }}>
-                                    ⚙️ Log out
-                                </button>
-                                <button 
-                                    type='button'
-                                    className='col btn btn-danger btn-sm text-light rounded m-1'
-                                    onClick={(e) => {
-                                        handleDeleteCurrent(e, user)
-                                    }}>
-                                    ⚙️ Delete account
-                                </button>
-                            </div>
-                        </div>
-                        <div hey={uuid()} className='row d-flex flex-row justify-content-center flex-wrap mt-4'>
-                            <div className='col m-2'
-                                style={{maxWidth: 550 + 'px'}}>
-                                {
-                                    
-                                    admins.map((user) => (
-                                         <div id={uuid()} 
-                                            className='container-fluid bg-light text-dark rounded p-4 m-2'
-                                            style={{maxWidth: 550 + 'px'}}>
-                                                <h4 className='col'> ⚙️ {user.name} <span> </span>
-                                                        <span className="badge rounded-pill bg-warning text-dark"> 🕵️ {user.role} </span>
-                                                </h4>
-                                                <div className='row'> 
-                                                    <span className='col'> 📮 {user.email} </span>
-                                                </div>
-                                                <div className='row'> 
-                                                    <span className='col text-dark'> 📅 <span> </span>
-                                                        <span className='text-primary font-weight-large'>
-                                                            {new Date(user.date).toDateString()} 
-                                                        </span> 
-                                                    </span>
-                                                </div>
-                                                <div className='row'>
-                                                    <button 
-                                                        className='btn btn-sm btn-outline-info col m-2 me-1'
-                                                        
-                                                        onClick={(e) => {handleMakeUser(e, user)}}> 
-                                                        Make user
-                                                    </button>
-                                                </div> 
-                                            </div>  
-                                    ))
-                                }
-                                {
-                                    users.map((user) => (
-                                        <div id={uuid()} 
-                                            className='container-fluid d-grid bg-light text-dark rounded p-4 m-2'
-                                            style={{maxWidth: 550 + 'px'}}>
-                                            <h4 className='col'> 🧠 {user.name} <span> </span>
-                                                    <span className="badge rounded-pill bg-primary text-light"> 🥇 {user.score} points </span>
-                                            </h4>
-                                            <div className='row'> 
-                                                <span className='col'> 📮 {user.email} <br/> 📚 {user.knownWords.length} words learned<br/>
-                                                    <span className='col text-dark'> 📅 <span> </span>
-                                                        <span className='text-primary'> 
-                                                            {new Date(user.date).toDateString()} 
-                                                        </span> 
-                                                    </span>
-                                                </span>
-                                                <div className='row mt-2'>
-                                                    <button 
-                                                        className='btn btn-sm btn-outline-danger col ms-4 m-2 me-1'
-                                                        onClick={(e) => {handleDelete(e, user)}}> 
-                                                        Remove user
-                                                    </button>
-                                                    <button 
-                                                        className='btn btn-sm btn-outline-warning col m-2 me-1'
-                                                        onClick={(e) => {handleAdmin(e, user)}}> 
-                                                        Make admin
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
-                                }                 
-                                               
-                            </div>
-
-                        <Form 
-                            id='add-form'
-                            style={{visibility: 'hidden', maxWidth: 300 + 'px'}}
-                            className='col m-2 p-4'>
-                            <h4> Add a new word </h4>    
-                            <div className='user-wrapper d-flex flex-column form-floating mb-3'>
-                                <Form.Control 
-                                    as='input'
-                                    required
-                                    type='text' 
-                                    className='form-control' 
-                                    id='base-input' 
-                                    placeholder='Name'
-                                    onChange={(e) => {
-                                        setBase(e.target.value)
-                                    }}/>
-                                <label htmlFor="base-input">Base word</label>
-                            </div>
-                            <div className='email-wrapper d-flex flex-column form-floating mb-3'>
-                                <Form.Control 
-                                    as='input'
-                                    required
-                                    type='text' 
-                                    className='form-control' 
-                                    id='target-input' 
-                                    placeholder='name@example.com'
-                                    onChange={(e) => {
-                                        setTarget(e.target.value)
-                                    }}/>
-                                <label htmlFor="target-input">Target word</label>
-                            </div>
-                            <div className='pass-wrapper form-floating mb-3'>
-                                <Form.Control 
-                                    required
-                                    readOnly
-                                    as='input'
-                                    type='number' 
-                                    className='form-control' 
-                                    id='points-input'
-                                    value={allWords.length + 1}
-                                    onChange={(e) => {
-                                        setPoints(e.target.value)
-                                        
-                                    }}/>
-                                <label htmlFor="points-input">Points</label>
-                            </div>
-                            <button className='btn btn-primary'
-                            type='submit'
-                            onClick={(e) => {
-                                handleSubmit(e)
-                            }}> Insert </button>
-                        </Form>
-                    </div>
-                    </div>
-                </>
-                
+                <AdminBoard/>
             )}
                
         </>
         ) : (
-            <Login/>
+            <Landing/>
         )}
         </div>
     )
